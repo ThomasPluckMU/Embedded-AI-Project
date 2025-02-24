@@ -1,0 +1,164 @@
+#!/usr/bin/env python3
+"""
+Script to generate sprint velocity charts from GitHub milestones.
+This script analyzes completed milestones and generates a velocity chart.
+
+Requirements:
+- Issues must have a label for story points (e.g., "points:1", "points:3", etc.)
+- Issues must be assigned to milestones
+- Milestone naming should follow a consistent pattern (e.g., "Sprint 1", "Sprint 2")
+"""
+
+import os
+import re
+import pathlib
+from github import Github
+import matplotlib.pyplot as plt
+import pandas as pd
+
+# Configure GitHub access
+GITHUB_TOKEN = os.environ.get('GITHUB_TOKEN')
+REPO_NAME = os.environ.get('GITHUB_REPOSITORY')  # Format: owner/repo
+
+# Configure story point labels
+POINT_LABEL_PATTERN = r'^points:(\d+)$'
+
+# Directories
+REPORTS_DIR = pathlib.Path('reports/velocity_charts')
+REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+
+
+def get_completed_milestones():
+    """Get all completed milestones sorted by date."""
+    g = Github(GITHUB_TOKEN)
+    repo = g.get_repo(REPO_NAME)
+    
+    closed_milestones = list(repo.get_milestones(state='closed'))
+    closed_milestones.sort(key=lambda m: m.closed_at)
+    
+    return closed_milestones
+
+
+def get_story_points(issue):
+    """Extract story points from issue labels."""
+    for label in issue.labels:
+        match = re.match(POINT_LABEL_PATTERN, label.name)
+        if match:
+            return int(match.group(1))
+    return 0  # Default if no points label
+
+
+def calculate_velocity(milestone):
+    """Calculate the velocity for a given milestone."""
+    g = Github(GITHUB_TOKEN)
+    repo = g.get_repo(REPO_NAME)
+    
+    # Get all closed issues in the milestone
+    milestone_issues = repo.get_issues(milestone=milestone, state='closed')
+    
+    # Calculate completed points
+    completed_points = sum(get_story_points(issue) for issue in milestone_issues)
+    
+    # Get all issues in the milestone (including open ones for commitment calculation)
+    all_milestone_issues = repo.get_issues(milestone=milestone, state='all')
+    
+    # Calculate committed points
+    committed_points = sum(get_story_points(issue) for issue in all_milestone_issues)
+    
+    # Calculate completion ratio
+    completion_ratio = (completed_points / committed_points) if committed_points > 0 else 0
+    
+    return {
+        'milestone': milestone.title,
+        'completed_points': completed_points,
+        'committed_points': committed_points,
+        'completion_ratio': completion_ratio
+    }
+
+
+def generate_velocity_chart(milestones_data):
+    """Create a velocity chart from the milestones data."""
+    df = pd.DataFrame(milestones_data)
+    
+    plt.figure(figsize=(12, 6))
+    
+    # Create bar chart
+    ax = plt.subplot(111)
+    width = 0.35
+    
+    # Plot committed and completed points
+    indices = range(len(df))
+    committed_bars = ax.bar([i - width/2 for i in indices], df['committed_points'], width, label='Committed')
+    completed_bars = ax.bar([i + width/2 for i in indices], df['completed_points'], width, label='Completed')
+    
+    # Plot completion ratio line on secondary axis
+    ax2 = ax.twinx()
+    completion_line = ax2.plot(indices, df['completion_ratio'] * 100, 'r-', label='Completion %')
+    
+    # Add labels and title
+    ax.set_xlabel('Sprint')
+    ax.set_ylabel('Story Points')
+    ax2.set_ylabel('Completion Percentage')
+    plt.title('Sprint Velocity Chart')
+    
+    # Set x-axis ticks to milestone names
+    ax.set_xticks(indices)
+    ax.set_xticklabels(df['milestone'], rotation=45)
+    
+    # Set y-axis range for completion percentage
+    ax2.set_ylim([0, 110])  # 0% to 110%
+    
+    # Add completion percentage labels
+    for i, ratio in enumerate(df['completion_ratio']):
+        ax2.annotate(f'{ratio*100:.1f}%', 
+                    xy=(i, ratio*100),
+                    xytext=(0, 5),
+                    textcoords='offset points',
+                    ha='center')
+    
+    # Combine legends
+    lines, labels = ax.get_legend_handles_labels()
+    lines2, labels2 = ax2.get_legend_handles_labels()
+    ax2.legend(lines + lines2, labels + labels2, loc='upper left')
+    
+    # Add grid
+    ax.grid(True, linestyle='--', alpha=0.7)
+    
+    # Adjust layout
+    plt.tight_layout()
+    
+    # Save the chart
+    filename = f"{REPORTS_DIR}/velocity_chart.png"
+    plt.savefig(filename, dpi=300, bbox_inches='tight')
+    print(f"Velocity chart saved to {filename}")
+    
+    # Also save as latest for embedding
+    plt.savefig(f"{REPORTS_DIR}/latest_velocity.png", dpi=300, bbox_inches='tight')
+    print(f"Latest velocity chart saved to {REPORTS_DIR}/latest_velocity.png")
+
+
+def main():
+    """Main function to generate the velocity chart."""
+    completed_milestones = get_completed_milestones()
+    
+    if not completed_milestones:
+        print("No completed milestones found")
+        return
+    
+    print(f"Found {len(completed_milestones)} completed milestones")
+    
+    # Calculate velocity for each milestone
+    milestones_data = []
+    for milestone in completed_milestones:
+        print(f"Processing milestone: {milestone.title}")
+        velocity_data = calculate_velocity(milestone)
+        milestones_data.append(velocity_data)
+    
+    # Generate the velocity chart
+    generate_velocity_chart(milestones_data)
+    
+    print("Velocity chart generation complete")
+
+
+if __name__ == "__main__":
+    main()

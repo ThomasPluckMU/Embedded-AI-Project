@@ -1,0 +1,40 @@
+name: Update Burndown Chart
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Run daily at midnight
+  workflow_dispatch:      # Allow manual trigger
+
+jobs:
+  update-burndown:
+    runs-on: ubuntu-latest
+    name: Update Burndown Charts
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pygithub matplotlib pandas numpy
+      
+      - name: Generate Burndown Chart
+        run: python .github/scripts/generate_burndown.py
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add -f reports/burndown_charts/
+          git commit -m "Update burndown chart" || echo "No changes to commit"
+          git push
