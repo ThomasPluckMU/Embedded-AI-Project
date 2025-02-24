@@ -1,7 +1,21 @@
 import { useState } from 'react'
+import { AssemblyAI } from 'assemblyai'
+
+const client = new AssemblyAI({
+  apiKey: '', // TODO: add field for api key input
+})
 
 function NewProposal() {
 	const [file, setFile] = useState<File | null>(null)
+
+	const transcribeAudioFile = async (file: File) => {
+		const data = {
+			audio: file,
+			speaker_labels: true,
+		}
+
+		return await client.transcripts.transcribe(data)
+	}
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files) {
@@ -9,12 +23,13 @@ function NewProposal() {
 		}
 	}
 
-	const handleGenerateProposal = () => {
+	const handleGenerateProposal = async () => {
 		if (!file) return	
-		// TODO: transcribe if audio file
+		const transcription = await transcribeAudioFile(file)
+		console.log(transcription)
 		// TODO: generate sales proposal
 	}
-	
+	 
 	return (
 		<div className="flex flex-col justify-center items-center w-full">
 			<input 
