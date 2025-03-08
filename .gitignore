@@ -4,7 +4,6 @@ TOKEN
 *.fls
 *.log
 *.fdb_latexmk
-*.pdf
 *.out
 *.aux
 *.toc
