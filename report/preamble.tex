@@ -1,0 +1,70 @@
+% Required base packages
+\usepackage{graphicx}
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage[ruled,vlined,linesnumbered]{algorithm2e}
+\usepackage{pgfgantt}
+\usepackage{rotating}
+
+% TikZ and circuit drawing packages
+\usepackage{tikz}
+\usepackage{circuitikz}
+
+% TikZ libraries
+\usetikzlibrary{babel}
+\usetikzlibrary{circuits}
+\usetikzlibrary{circuits.ee.IEC}
+\usetikzlibrary{circuits.logic.US}
+
+% Hyperref setup
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    urlcolor=cyan,
+    pdftitle={Digital Ising Machines},
+    pdfauthor={Thomas Pluck},
+    pdfsubject={MSc Thesis},
+    pdfkeywords={Ising Machines, FPGA, Optimization}
+}
+
+% Paper title and author information
+\title{Digital Ising Machines}
+\author{
+    \IEEEauthorblockN{Thomas Pluck\\MSc Robotics and Embedded AI Candidate\thanks{Corresponding author: thomas.pluck.2025@mumail.ie}}
+    \IEEEauthorblockA{Department of Electronic Engineering\\
+    Maynooth University\\
+    Maynooth, Ireland}
+}
+
+% Additional settings for circuitikz
+\ctikzset{
+    logic ports=ieee,
+    logic ports/scale=0.8,
+    bipoles/length=1cm
+}
+
+% Configure TikZ styles
+\tikzset{
+    buffer port/.style={
+        rectangle,
+        draw,
+        minimum width=1cm,
+        minimum height=0.6cm,
+        inner sep=2pt
+    },
+    oscillator/.style={
+        circle,
+        draw,
+        minimum size=0.8cm
+    }
+}
+
+% Math configurations
+\DeclareMathOperator{\sign}{sgn}  % Sign function
+\DeclareMathOperator{\Tr}{Tr}     % Trace operator
+\DeclareMathOperator*{\argmin}{arg\,min} % Argument minimum

@@ -1,0 +1,77 @@
+% BibTeX definition
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em\TeX}}
+
+% Custom title page command
+\newcommand{\maketitlepage}{
+    \begin{titlepage}
+        \centering
+        {\huge\bfseries SOLUTION PROPOSAL\\}
+        \vspace*{2cm}
+        {\huge\bfseries B2B Sales Generative AI Assistant Prototype}
+        \vfill
+        \includegraphics[scale=0.3]{figures/abstract_logo.png}
+        \vfill
+        {\Large\bfseries EE656 Embedded AI Project Group 1\par}
+        \vspace{1cm}
+        {\large\itshape Thomas Pluck\par}
+        {\large\itshape Bryan E. McCarthy\par}
+        {\large\itshape Sanjana M. Lokesh\par}
+        {\large\itshape Kamal S. Veeranki\par}
+        \vspace{1.5cm}
+        {\large Department of Electronic Engineering\par}
+        {\large Maynooth University\par}
+        {\large Maynooth, Ireland\par}
+        \vspace{2cm}
+                
+        \vfill
+    \end{titlepage}
+}
+
+% Mathematical notation shortcuts
+\newcommand{\R}{\mathbb{R}}        % Real numbers
+\newcommand{\Z}{\mathbb{Z}}        % Integers
+\newcommand{\N}{\mathbb{N}}        % Natural numbers
+\newcommand{\T}{\mathbb{T}}        % Torus
+\newcommand{\C}{\mathbb{C}}        % Complex numbers
+
+% Vector notation
+\newcommand{\vect}[1]{\mathbf{#1}} % Bold vector notation
+\newcommand{\mat}[1]{\mathbf{#1}}  % Bold matrix notation
+
+% Probability and statistics
+\newcommand{\E}{\mathbb{E}}        % Expected value
+\newcommand{\Var}{\mathrm{Var}}    % Variance
+\newcommand{\Cov}{\mathrm{Cov}}    % Covariance
+\newcommand{\Prob}{\mathbb{P}}     % Probability
+
+% Physics notation
+\newcommand{\dd}{\mathrm{d}}       % Differential operator
+\newcommand{\pdiff}[2]{\frac{\partial #1}{\partial #2}} % Partial derivative
+
+% Custom environments
+\newenvironment{theorem}[1][\unskip]{\begin{trivlist}\item[\hskip \labelsep {\bfseries Theorem #1.}]}{\end{trivlist}}
+\newenvironment{lemma}[1][\unskip]{\begin{trivlist}\item[\hskip \labelsep {\bfseries Lemma #1.}]}{\end{trivlist}}
+\newenvironment{proof}[1][\unskip]{\begin{trivlist}\item[\hskip \labelsep {\itshape Proof #1.}]}{\hfill$\square$\end{trivlist}}
+
+% Circuit diagram shortcuts
+\newcommand{\buffer}{\circled{>}}   % Buffer symbol
+\newcommand{\inverter}{\circled{1}} % Inverter symbol
+\newcommand{\coupling}{\text{---}}  % Coupling line
+
+% Section referencing
+\newcommand{\secref}[1]{Section~\ref{#1}}
+\newcommand{\figref}[1]{Figure~\ref{#1}}
+\newcommand{\tabref}[1]{Table~\ref{#1}}
+
+% Algorithm notation
+\newcommand{\BigO}[1]{\mathcal{O}(#1)}  % Big-O notation
+\newcommand{\complexity}[1]{\text{#1}}   % Complexity class
+
+% Quantum mechanics notation (since you discuss quantum annealing)
+\newcommand{\bra}[1]{\left\langle#1\right|}
+\newcommand{\ket}[1]{\left|#1\right\rangle}
+\newcommand{\braket}[2]{\left\langle#1|#2\right\rangle}
+
+% Complexity notation
+\newcommand{\Poly}{\mathcal{P}}
+\newcommand{\NP}{\mathcal{NP}}
