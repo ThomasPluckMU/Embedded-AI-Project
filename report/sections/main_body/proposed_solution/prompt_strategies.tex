@@ -1,0 +1,52 @@
+\section{Prompt Strategies}
+Prompt strategies are essential for refining AI-generated responses, ensuring accuracy, efficiency, and contextual understanding. When working with LLaMA 2 and LangChain, selecting the right prompt strategy can improve AI’s performance, enhance reasoning, and fine-tune outputs for specific applications. This section explores different strategies that can be used to maximize AI’s potential.
+
+\subsection{Zero-Shot Prompting}
+\textbf{Definition:} In zero-shot prompting, the AI is given a task or question without prior examples, relying solely on its pre-existing knowledge to respond. \\
+\textbf{Example:} "Can you explain reinforcement learning in simple terms?" \\
+\textbf{Use Case:} Best for quick responses to general or factual queries. \\
+\textbf{Limitations:} The responses may lack depth or structure, depending on the AI’s training data. \cite{radford2019language}
+
+\subsection{Few-Shot Prompting}
+\textbf{Definition:} This strategy involves providing a few examples to guide the model in completing a similar task. It helps set patterns and expectations for the AI. \\
+\textbf{Example:} "A cat is small, enjoys napping. A dog is loyal, loves to play. Now, describe a parrot." \\
+\textbf{Use Case:} Useful in tasks requiring a specific style or format, such as creative writing. \\
+\textbf{Limitations:} It requires more input and may not always generalize well to novel tasks. \cite{brown2020language}
+
+\subsection{Instruction-Based Prompting}
+\textbf{Definition:} Instruction-based prompting explicitly tells the AI what to do, often resulting in more structured outputs. \\
+\textbf{Example:} "Summarize the following paragraph in one sentence." \\
+\textbf{Use Case:} Excellent for summarization, programming, and when you need clear step-by-step guidance. \\
+\textbf{Limitations:} The AI’s response is highly dependent on how well the instructions are framed. \cite{neelakantan2021text}
+
+\subsection{Chain-of-Thought (CoT) Prompting}
+\textbf{Definition:} CoT prompting encourages the AI to break down complex tasks into sequential steps, enhancing logical reasoning. \\
+\textbf{Example:} "A farmer has 3 chickens, each laying 2 eggs daily. How many eggs will he have in one week? Break it down step by step." \\
+\textbf{Use Case:} Best for tasks involving math, logical reasoning, and problem-solving. \\
+\textbf{Limitations:} Requires more computation and results in longer outputs. \cite{wei2022chain}
+
+\subsection{Self-Consistency Prompting}
+\textbf{Definition:} This method involves generating multiple responses and selecting the most consistent one, ensuring accuracy. \\
+\textbf{Example:} Ask the same question multiple times, then compare the answers for consistency. \\
+\textbf{Use Case:} Critical for tasks demanding high accuracy, such as medical or legal information. \\
+\textbf{Limitations:} It increases computational cost, as multiple answers need to be generated. \cite{wang2022self}
+
+\subsection{Persona-Based Prompting}
+\textbf{Definition:} The AI is assigned a specific role, which tailors its responses based on that persona’s expertise. \\
+\textbf{Example:} "Imagine you're a cybersecurity expert. Explain how phishing attacks work and how to prevent them." \\
+\textbf{Use Case:} Ideal for role-playing scenarios, customer support, or expert advice. \\
+\textbf{Limitations:} The AI might generate inaccurate information if it lacks enough data or context. \cite{zhao2021taxonomy}
+
+\subsection{Retrieval-Augmented Generation (RAG) with LangChain}
+\textbf{Definition:} RAG enhances the model by retrieving up-to-date information from external sources before generating the output. LangChain helps integrate real-time data, like stock market prices. \\
+\textbf{Example:} Using LangChain to pull in the latest stock data for generating financial insights. \\
+\textbf{Use Case:} Useful for applications needing real-time information, such as financial analysis or news aggregation. \\
+\textbf{Limitations:} Requires external data sources and adds computational complexity. \cite{lewis2020retrieval}
+
+\subsection{Conclusion}
+For this project, I have chosen the LangChain method as it allows for real-time conversations, making it a suitable choice for voice-based interactions. The ability to retrieve and generate real-time data makes LangChain an ideal tool for building dynamic, interactive applications that can respond instantly to users' needs.
+
+\bibliographystyle{plain}  
+\bibliography{references} 
+
+\end{document}
