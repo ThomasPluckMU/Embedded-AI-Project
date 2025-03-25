@@ -1,0 +1,13 @@
+TOKEN
+.secrets
+*.json
+*.fls
+*.log
+*.fdb_latexmk
+*.out
+*.aux
+*.toc
+*.bbl
+*.blg
+*.gz
+*.dvi
