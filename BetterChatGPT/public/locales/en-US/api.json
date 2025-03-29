@@ -7,7 +7,9 @@
   },
   "apiKey": {
     "howTo": "Get your personal API key <0>here</0>.",
-    "inputLabel": "API Key"
+    "howToAssemblyAi": "Get your personal Assembly API key <0>here</0>.",
+    "inputLabel": "API Key",
+    "assemblyAiInputLabel": "AssemblyAI API Key"
   },
   "customEndpoint": "Use custom API endpoint",
   "advancedConfig": "View advanced API configuration <0>here</0>",
