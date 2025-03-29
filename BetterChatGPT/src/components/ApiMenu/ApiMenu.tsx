@@ -22,6 +22,9 @@ const ApiMenu = ({
   const apiEndpoint = useStore((state) => state.apiEndpoint);
   const setApiEndpoint = useStore((state) => state.setApiEndpoint);
 
+  const assemblyAiApiKey = useStore((state) => state.assemblyAiApiKey);
+  const setAssemblyAiApiKey = useStore((state) => state.setAssemblyAiApiKey);
+  
   const [_apiKey, _setApiKey] = useState<string>(apiKey || '');
   const [_apiEndpoint, _setApiEndpoint] = useState<string>(apiEndpoint);
   const [_customEndpoint, _setCustomEndpoint] = useState<boolean>(
