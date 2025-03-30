@@ -4,6 +4,8 @@ import useStore from '@store/store';
 
 import useSubmit from '@hooks/useSubmit';
 
+import { AssemblyAI } from 'assemblyai'
+
 import { ChatInterface } from '@type/chat';
 
 import PopupModal from '@components/PopupModal';
@@ -180,9 +182,59 @@ const EditViewButtons = memo(
     const generating = useStore.getState().generating;
     const advancedMode = useStore((state) => state.advancedMode);
 
+    const assemblyAiApiKey = useStore((state) => state.assemblyAiApiKey);
+
+  	const [audioFile, setAudioFile] = useState<File | null>(null);
+
+  	const client = new AssemblyAI({
+      apiKey: assemblyAiApiKey ? assemblyAiApiKey : '',
+    });
+
+  	const transcribeAudioFile = async () => {
+  		if (!audioFile) return	
+  		const data = {
+  			audio: audioFile,
+  			speaker_labels: true,
+  		};
+
+  		const transcription =  await client.transcripts.transcribe(data);
+  		console.log(transcription);
+  		setAudioFile(null);
+  	}
+
+  	const handleAudioFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  		if (e.target.files) {
+  			setAudioFile(e.target.files[0]);
+  		}
+  	}
+
     return (
       <div className='flex'>
-        <div className='flex-1 text-center mt-2 flex justify-center'>
+        <div className='flex-1 text-center mt-2 flex justify-center items-center'>
+
+          <div className='flex mr-auto items-center'>
+            <p className='text-neutral-200'>Upload Audio File</p>
+            <div className='btn-neutral relative mr-auto ml-2 block w-8 h-8 rounded border overflow-hidden cursor-pointer'>
+              <input
+                type='file'
+                className='absolute inset-0 opacity-0 w-full h-full'
+        				onChange={handleAudioFileInputChange}
+              />
+              <div className='absolute inset-0 flex items-center justify-center pointer-events-none text-2xl'>
+                ↑
+              </div>
+            </div>
+
+            {audioFile && (
+              <button
+                className='btn btn-neutral h-8 ml-2'
+                onClick={transcribeAudioFile}
+              >
+                Transcribe
+              </button>
+            )}
+          </div>
+          
           {sticky && (
             <button
               className={`btn relative mr-2 btn-primary ${
