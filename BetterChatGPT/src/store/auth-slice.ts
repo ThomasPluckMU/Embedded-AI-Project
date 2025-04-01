@@ -4,9 +4,11 @@ import { StoreSlice } from './store';
 export interface AuthSlice {
   apiKey?: string;
   apiEndpoint: string;
+  assemblyAiApiKey?: string;
   firstVisit: boolean;
   setApiKey: (apiKey: string) => void;
   setApiEndpoint: (apiEndpoint: string) => void;
+  setAssemblyAiApiKey: (assemblyAiApiKey: string) => void;
   setFirstVisit: (firstVisit: boolean) => void;
 }
 
@@ -24,6 +26,12 @@ export const createAuthSlice: StoreSlice<AuthSlice> = (set, get) => ({
     set((prev: AuthSlice) => ({
       ...prev,
       apiEndpoint: apiEndpoint,
+    }));
+  },
+  setAssemblyAiApiKey: (assemblyAiApiKey: string) => {
+    set((prev: AuthSlice) => ({
+      ...prev,
+      assemblyAiApiKey: assemblyAiApiKey,
     }));
   },
   setFirstVisit: (firstVisit: boolean) => {

@@ -44,6 +44,7 @@ export const createPartializedState = (state: StoreState) => ({
   currentChatIndex: state.currentChatIndex,
   apiKey: state.apiKey,
   apiEndpoint: state.apiEndpoint,
+  assemblyAiApiKey: state.assemblyAiApiKey,
   theme: state.theme,
   autoTitle: state.autoTitle,
   advancedMode: state.advancedMode,
