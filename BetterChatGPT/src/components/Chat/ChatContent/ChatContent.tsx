@@ -12,6 +12,7 @@ import useSubmit from '@hooks/useSubmit';
 import DownloadChat from './DownloadChat';
 import CloneChat from './CloneChat';
 import ShareGPT from '@components/ShareGPT';
+import IngestToChroma from './IngestToChroma';
 
 const ChatContent = () => {
   const inputRole = useStore((state) => state.inputRole);
@@ -110,6 +111,7 @@ const ChatContent = () => {
                 <DownloadChat saveRef={saveRef} />
                 <ShareGPT />
                 <CloneChat />
+                <IngestToChroma />
               </div>
             )}
           </div>

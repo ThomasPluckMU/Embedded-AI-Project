@@ -1,1 +1,4 @@
-chromadbx
+chromadb
+flask
+flask-cors
+
