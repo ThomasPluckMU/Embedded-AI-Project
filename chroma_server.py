@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Simple Flask server to handle ChromaDB ingestion from BetterChatGPT.
+Simple Flask server to handle ChromaDB ingestion and retrieval from BetterChatGPT.
 """
 
 import os
@@ -75,6 +75,66 @@ def ingest():
             "success": True,
             "message": f"Successfully ingested {len(documents)} messages",
             "count": len(documents)
+        })
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/query', methods=['POST'])
+def query():
+    """
+    Query ChromaDB for relevant context based on the user's query.
+    
+    Expected format:
+    {
+        "query": "user query text",
+        "n_results": 5  # optional, defaults to 3
+    }
+    
+    Returns:
+    {
+        "success": true,
+        "results": [
+            {
+                "id": "document_id",
+                "text": "document text",
+                "metadata": {...},
+                "distance": 0.123  # cosine distance score
+            },
+            ...
+        ]
+    }
+    """
+    try:
+        data = request.json
+        
+        if not data or 'query' not in data:
+            return jsonify({"error": "Invalid request format"}), 400
+        
+        query_text = data['query']
+        n_results = data.get('n_results', 3)  # Default to 3 if not specified
+        
+        # Query the collection
+        results = collection.query(
+            query_texts=[query_text],
+            n_results=n_results,
+            include=["documents", "metadatas", "distances"]
+        )
+        
+        # Format the results
+        formatted_results = []
+        if results["documents"][0]:  # Check if any results were found
+            for i, doc in enumerate(results["documents"][0]):
+                formatted_results.append({
+                    "id": results["ids"][0][i],
+                    "text": doc,
+                    "metadata": results["metadatas"][0][i],
+                    "distance": results["distances"][0][i]
+                })
+        
+        return jsonify({
+            "success": True,
+            "results": formatted_results
         })
         
     except Exception as e:

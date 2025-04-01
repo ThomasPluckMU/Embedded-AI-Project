@@ -22,6 +22,31 @@ export const parseEventSource = (
   return result;
 };
 
+export const fetchRAGContext = async (query: string, n_results: number = 3) => {
+  try {
+    const response = await fetch('http://localhost:8000/query', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        query,
+        n_results,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch RAG context');
+    }
+
+    const data = await response.json();
+    return data.results || [];
+  } catch (error) {
+    console.error('Error fetching RAG context:', error);
+    return [];
+  }
+};
+
 export const createMultipartRelatedBody = (
   metadata: object,
   file: File,

@@ -3,7 +3,7 @@ import useStore from '@store/store';
 import { useTranslation } from 'react-i18next';
 import { ChatInterface, MessageInterface } from '@type/chat';
 import { getChatCompletion, getChatCompletionStream } from '@api/api';
-import { parseEventSource } from '@api/helper';
+import { parseEventSource, fetchRAGContext } from '@api/helper';
 import { limitMessageTokens, updateTotalTokenUsed } from '@utils/messageUtils';
 import { _defaultChatConfig } from '@constants/chat';
 import { officialAPIEndpoint } from '@constants/auth';
@@ -53,6 +53,7 @@ const useSubmit = () => {
 
   const handleSubmit = async () => {
     const chats = useStore.getState().chats;
+    const useRAG = useStore.getState().useRAG;
     if (generating || !chats) return;
 
     const updatedChats: ChatInterface[] = JSON.parse(JSON.stringify(chats));
@@ -70,11 +71,45 @@ const useSubmit = () => {
       if (chats[currentChatIndex].messages.length === 0)
         throw new Error('No messages submitted!');
 
-      const messages = limitMessageTokens(
-        chats[currentChatIndex].messages,
+      // Get the original messages
+      let messages = [...chats[currentChatIndex].messages];
+      
+      // Add RAG context if enabled
+      if (useRAG) {
+        // Get the last user message
+        const lastUserMessageIndex = messages
+          .slice(0, -1) // Exclude the empty assistant message we just added
+          .map((msg, i) => msg.role === 'user' ? i : -1)
+          .filter(i => i !== -1)
+          .pop();
+        
+        if (lastUserMessageIndex !== undefined) {
+          const lastUserMessage = messages[lastUserMessageIndex];
+          
+          // Fetch context from RAG
+          const ragResults = await fetchRAGContext(lastUserMessage.content);
+          
+          if (ragResults.length > 0) {
+            // Create a system message with the retrieved context
+            const contextTexts = ragResults.map(result => result.text);
+            const contextMessage: MessageInterface = {
+              role: 'system',
+              content: `Here is relevant information from the knowledge base that may help with the user's query:\n\n${contextTexts.join('\n\n')}\n\nUse this information to enhance your response if relevant.`
+            };
+            
+            // Insert context as a system message before the last user message
+            messages.splice(lastUserMessageIndex, 0, contextMessage);
+          }
+        }
+      }
+      
+      // Apply token limits
+      messages = limitMessageTokens(
+        messages,
         chats[currentChatIndex].config.max_tokens,
         chats[currentChatIndex].config.model
       );
+      
       if (messages.length === 0) throw new Error('Message exceed max token!');
 
       // no api key (free)

@@ -24,6 +24,8 @@ const EditView = ({
   const inputRole = useStore((state) => state.inputRole);
   const setChats = useStore((state) => state.setChats);
   const currentChatIndex = useStore((state) => state.currentChatIndex);
+  const useRAG = useStore((state) => state.useRAG);
+  const setUseRAG = useStore((state) => state.setUseRAG);
 
   const [_content, _setContent] = useState<string>(content);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -128,6 +130,25 @@ const EditView = ({
             : ''
         }`}
       >
+        {sticky && (
+          <div className="flex items-center gap-2 mb-2">
+            <button
+              type="button"
+              className={`text-xs px-2 py-0.5 rounded-md flex items-center gap-1 transition-colors ${
+                useRAG 
+                  ? 'bg-green-500 text-white hover:bg-green-600' 
+                  : 'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-500'
+              }`}
+              onClick={() => setUseRAG(!useRAG)}
+              title={useRAG ? 'RAG is enabled - Using ChromaDB for context retrieval' : 'RAG is disabled - Toggle to enable ChromaDB context retrieval'}
+            >
+              <svg viewBox="0 0 1024 1024" fill="currentColor" style={{ width: '14px', height: '14px' }}>
+                <path d="M854.6 288.6L639.4 73.4c-6-6-14.1-9.4-22.6-9.4H192c-17.7 0-32 14.3-32 32v832c0 17.7 14.3 32 32 32h640c17.7 0 32-14.3 32-32V311.3c0-8.5-3.4-16.7-9.4-22.7zM790.2 326H602V137.8L790.2 326zm1.8 562H232V136h302v216a42 42 0 0042 42h216v494zM504 618H320c-4.4 0-8 3.6-8 8v48c0 4.4 3.6 8 8 8h184c4.4 0 8-3.6 8-8v-48c0-4.4-3.6-8-8-8zM312 490v48c0 4.4 3.6 8 8 8h384c4.4 0 8-3.6 8-8v-48c0-4.4-3.6-8-8-8H320c-4.4 0-8 3.6-8 8z" />
+              </svg>
+              <span>RAG {useRAG ? 'ON' : 'OFF'}</span>
+            </button>
+          </div>
+        )}
         <textarea
           ref={textareaRef}
           className='m-0 resize-none rounded-lg bg-transparent overflow-y-hidden focus:ring-0 focus-visible:ring-0 leading-7 w-full placeholder:text-gray-500/40'

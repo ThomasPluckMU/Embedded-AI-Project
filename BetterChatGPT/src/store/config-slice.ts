@@ -17,6 +17,7 @@ export interface ConfigSlice {
   markdownMode: boolean;
   countTotalTokens: boolean;
   totalTokenUsed: TotalTokenUsed;
+  useRAG: boolean;
   setOpenConfig: (openConfig: boolean) => void;
   setTheme: (theme: Theme) => void;
   setAutoTitle: (autoTitle: boolean) => void;
@@ -30,6 +31,7 @@ export interface ConfigSlice {
   setMarkdownMode: (markdownMode: boolean) => void;
   setCountTotalTokens: (countTotalTokens: boolean) => void;
   setTotalTokenUsed: (totalTokenUsed: TotalTokenUsed) => void;
+  setUseRAG: (useRAG: boolean) => void;
 }
 
 export const createConfigSlice: StoreSlice<ConfigSlice> = (set, get) => ({
@@ -46,6 +48,7 @@ export const createConfigSlice: StoreSlice<ConfigSlice> = (set, get) => ({
   markdownMode: true,
   countTotalTokens: false,
   totalTokenUsed: {},
+  useRAG: false,
   setOpenConfig: (openConfig: boolean) => {
     set((prev: ConfigSlice) => ({
       ...prev,
@@ -122,6 +125,12 @@ export const createConfigSlice: StoreSlice<ConfigSlice> = (set, get) => ({
     set((prev: ConfigSlice) => ({
       ...prev,
       totalTokenUsed: totalTokenUsed,
+    }));
+  },
+  setUseRAG: (useRAG: boolean) => {
+    set((prev: ConfigSlice) => ({
+      ...prev,
+      useRAG: useRAG,
     }));
   },
 });
