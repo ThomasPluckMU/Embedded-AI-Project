@@ -1,0 +1,23 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Install BetterChatGPT dependencies
+        working-directory: ./BetterChatGPT
+        run: npm ci
+      - name: Build app
+        working-directory: ./BetterChatGPT
+        run: npm run build
