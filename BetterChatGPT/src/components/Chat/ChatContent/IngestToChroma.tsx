@@ -58,6 +58,7 @@ const IngestToChroma = React.memo(() => {
       setIngestResult('Chat successfully ingested to ChromaDB');
     } catch (error) {
       console.error('Error ingesting chat to ChromaDB:', error);
+      // @ts-ignore
       setIngestResult(`Error: ${error.message}`);
     } finally {
       setIsIngesting(false);

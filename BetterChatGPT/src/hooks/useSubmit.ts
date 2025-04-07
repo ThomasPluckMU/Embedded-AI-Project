@@ -91,6 +91,7 @@ const useSubmit = () => {
           
           if (ragResults.length > 0) {
             // Create a system message with the retrieved context
+            // @ts-ignore
             const contextTexts = ragResults.map(result => result.text);
             const contextMessage: MessageInterface = {
               role: 'system',
