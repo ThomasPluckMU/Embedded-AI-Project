@@ -113,6 +113,12 @@ const EditView = ({
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
       textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+      
+      // Focus the textarea and place cursor at end when transcription is added
+      if (_content) {
+        textareaRef.current.focus();
+        textareaRef.current.setSelectionRange(_content.length, _content.length);
+      }
     }
   }, [_content]);
 
@@ -206,21 +212,54 @@ const EditViewButtons = memo(
     const assemblyAiApiKey = useStore((state) => state.assemblyAiApiKey);
 
   	const [audioFile, setAudioFile] = useState<File | null>(null);
+    const [isTranscribing, setIsTranscribing] = useState<boolean>(false);
 
   	const client = new AssemblyAI({
       apiKey: assemblyAiApiKey ? assemblyAiApiKey : '',
     });
 
   	const transcribeAudioFile = async () => {
-  		if (!audioFile) return	
-  		const data = {
-  			audio: audioFile,
-  			speaker_labels: true,
-  		};
-
-  		const transcription =  await client.transcripts.transcribe(data);
-  		console.log(transcription);
-  		setAudioFile(null);
+  		if (!audioFile) return;
+  		
+  		if (!assemblyAiApiKey) {
+  		  // Show a toast message using the store's error mechanism
+  		  useStore.getState().setError("AssemblyAI API key is required for audio transcription. Please add it in API settings.");
+  		  return;
+  		}
+  		
+  		try {
+  		  setIsTranscribing(true);
+  		  
+    		const data = {
+    			audio: audioFile,
+    			speaker_labels: true,
+    		};
+    
+    		const transcription = await client.transcripts.transcribe(data);
+    		
+    		let formattedText = '';
+    		if (transcription.utterances && transcription.utterances.length > 0) {
+    		  formattedText = transcription.utterances.map(utterance => 
+    		    `Speaker ${utterance.speaker}: ${utterance.text}`
+    		  ).join('\n\n');
+    		} else {
+    		  // Fallback to plain text if no utterances
+    		  formattedText = transcription.text || '';
+    		}
+    		
+    		_setContent(prevContent => {
+    		  // If there's already content, add a newline before the transcription
+    		  return prevContent.trim() ? `${prevContent}\n\n${formattedText}` : formattedText;
+    		});
+    		
+    		console.log(transcription);
+  		} catch (error: any) {
+  		  console.error("Transcription error:", error);
+  		  useStore.getState().setError(`Transcription failed: ${error.message || "Unknown error"}`);
+  		} finally {
+  		  setAudioFile(null);
+  		  setIsTranscribing(false);
+  		}
   	}
 
   	const handleAudioFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -233,26 +272,69 @@ const EditViewButtons = memo(
       <div className='flex'>
         <div className='flex-1 text-center mt-2 flex justify-center items-center'>
 
-          <div className='flex mr-auto items-center'>
-            <p className='text-neutral-200'>Upload Audio File</p>
-            <div className='btn-neutral relative mr-auto ml-2 block w-8 h-8 rounded border overflow-hidden cursor-pointer'>
-              <input
-                type='file'
-                className='absolute inset-0 opacity-0 w-full h-full'
-        				onChange={handleAudioFileInputChange}
-              />
-              <div className='absolute inset-0 flex items-center justify-center pointer-events-none text-2xl'>
-                ↑
+          <div className='flex mr-auto items-center gap-2'>
+            <div className="flex items-center">
+              <div 
+                className={`relative flex items-center gap-2 py-1 px-2 rounded border cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors ${!assemblyAiApiKey ? 'opacity-70' : 'btn-neutral'}`}
+                title={!assemblyAiApiKey ? "AssemblyAI API key required in API settings" : "Upload audio file for transcription"}
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
+                  <path d="M12 2a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z" />
+                  <path d="M19 10v1a7 7 0 0 1-14 0v-1M12 18.5V21" />
+                  <rect x="8" y="21" width="8" height="2" rx="1" />
+                </svg>
+                <span className="text-xs">Transcribe Audio</span>
+                {!assemblyAiApiKey && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3 h-3 text-yellow-500">
+                    <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                )}
+                <input
+                  type="file"
+                  accept="audio/*"
+                  className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
+                  onChange={handleAudioFileInputChange}
+                />
               </div>
             </div>
 
-            {audioFile && (
-              <button
-                className='btn btn-neutral h-8 ml-2'
-                onClick={transcribeAudioFile}
-              >
-                Transcribe
-              </button>
+            {audioFile && !isTranscribing && (
+              <div className="flex items-center gap-2">
+                <span className="text-xs truncate max-w-[100px]" title={audioFile.name}>
+                  {audioFile.name}
+                </span>
+                <button
+                  className="btn-primary py-1 px-3 rounded text-xs flex items-center gap-1 hover:opacity-90 transition-opacity"
+                  onClick={transcribeAudioFile}
+                  disabled={!assemblyAiApiKey}
+                  title={!assemblyAiApiKey ? "AssemblyAI API key required" : "Transcribe audio"}
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3 h-3">
+                    <path d="M5 12h14M12 5l7 7-7 7" />
+                  </svg>
+                  Transcribe
+                </button>
+                <button
+                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                  onClick={() => setAudioFile(null)}
+                  title="Cancel"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
+                    <path d="M18 6L6 18M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            )}
+            
+            {isTranscribing && (
+              <div className="flex items-center gap-2">
+                <div className="animate-pulse flex items-center gap-2">
+                  <div className="h-2 w-2 bg-blue-500 rounded-full"></div>
+                  <div className="h-2 w-2 bg-blue-500 rounded-full animation-delay-200"></div>
+                  <div className="h-2 w-2 bg-blue-500 rounded-full animation-delay-400"></div>
+                </div>
+                <span className="text-xs">Transcribing...</span>
+              </div>
             )}
           </div>
           
