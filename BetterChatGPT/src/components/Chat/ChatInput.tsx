@@ -2,7 +2,7 @@ import React from 'react';
 import { useState } from 'react';
 import RefreshIcon from '@icon/RefreshIcon';
 import SendIcon from '@icon/SendIcon';
-import { DEFAULT_PROMPTS, DEFAULT_PROMPT } from '../../../constants/prompt';
+import { DEFAULT_PROMPTS, DEFAULT_PROMPT } from '../../constants/prompt';
 
 // Define TypeScript interfaces
 interface Prompt {
