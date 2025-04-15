@@ -5,6 +5,7 @@ import { InputSlice, createInputSlice } from './input-slice';
 import { AuthSlice, createAuthSlice } from './auth-slice';
 import { ConfigSlice, createConfigSlice } from './config-slice';
 import { PromptSlice, createPromptSlice } from './prompt-slice';
+import { SystemPromptSlice, createSystemPromptSlice } from './prompt-slice';
 import { ToastSlice, createToastSlice } from './toast-slice';
 import {
   LocalStorageInterfaceV0ToV1,
@@ -32,6 +33,7 @@ export type StoreState = ChatSlice &
   AuthSlice &
   ConfigSlice &
   PromptSlice &
+  SystemPromptSlice &
   ToastSlice;
 
 export type StoreSlice<T> = (
@@ -49,6 +51,8 @@ export const createPartializedState = (state: StoreState) => ({
   autoTitle: state.autoTitle,
   advancedMode: state.advancedMode,
   prompts: state.prompts,
+  systemPrompts: state.systemPrompts,
+  activeSystemPromptId: state.activeSystemPromptId,
   defaultChatConfig: state.defaultChatConfig,
   defaultSystemMessage: state.defaultSystemMessage,
   hideMenuOptions: state.hideMenuOptions,
@@ -71,6 +75,7 @@ const useStore = create<StoreState>()(
       ...createAuthSlice(set, get),
       ...createConfigSlice(set, get),
       ...createPromptSlice(set, get),
+      ...createSystemPromptSlice(set, get),
       ...createToastSlice(set, get),
     }),
     {

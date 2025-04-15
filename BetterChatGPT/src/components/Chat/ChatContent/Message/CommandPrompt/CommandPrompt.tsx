@@ -13,8 +13,8 @@ const CommandPrompt = ({
   _setContent: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   const { t } = useTranslation();
-  const prompts = useStore((state) => state.prompts);
-  const [_prompts, _setPrompts] = useState<Prompt[]>(prompts);
+  const prompts = useStore((state) => state.prompts) || [];
+  const [_prompts, _setPrompts] = useState<Prompt[]>(Array.isArray(prompts) ? prompts : []);
   const [input, setInput] = useState<string>('');
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -28,14 +28,19 @@ const CommandPrompt = ({
   }, [dropDown]);
 
   useEffect(() => {
-    const filteredPrompts = matchSorter(useStore.getState().prompts, input, {
-      keys: ['name'],
-    });
+    const storePrompts = useStore.getState().prompts || [];
+    const filteredPrompts = Array.isArray(storePrompts) 
+      ? matchSorter(storePrompts, input, { keys: ['name'] })
+      : [];
     _setPrompts(filteredPrompts);
   }, [input]);
 
   useEffect(() => {
-    _setPrompts(prompts);
+    if (Array.isArray(prompts)) {
+      _setPrompts(prompts);
+    } else {
+      _setPrompts([]);
+    }
     setInput('');
   }, [prompts]);
 
@@ -65,18 +70,24 @@ const CommandPrompt = ({
           }}
         />
         <ul className='text-sm text-gray-700 dark:text-gray-200 p-0 m-0 w-max max-w-sm max-md:max-w-[90vw] max-h-32 overflow-auto'>
-          {_prompts.map((cp) => (
-            <li
-              className='px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white cursor-pointer text-start w-full'
-              onClick={() => {
-                _setContent((prev) => prev + cp.prompt);
-                setDropDown(false);
-              }}
-              key={cp.id}
-            >
-              {cp.name}
+          {Array.isArray(_prompts) && _prompts.length > 0 ? (
+            _prompts.map((cp) => (
+              <li
+                className='px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white cursor-pointer text-start w-full'
+                onClick={() => {
+                  _setContent((prev) => prev + cp.prompt);
+                  setDropDown(false);
+                }}
+                key={cp.id}
+              >
+                {cp.name}
+              </li>
+            ))
+          ) : (
+            <li className='px-4 py-2 text-gray-500 dark:text-gray-400'>
+              {t('noPrompts')}
             </li>
-          ))}
+          )}
         </ul>
       </div>
     </div>
