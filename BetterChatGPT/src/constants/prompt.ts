@@ -45,3 +45,5 @@ export const DEFAULT_PROMPT = DEFAULT_PROMPTS.professionalAssistant;
 export const getPromptByName = (name: string): Prompt => {
   return DEFAULT_PROMPTS[name] || DEFAULT_PROMPT;
 };
+
+export default {};
