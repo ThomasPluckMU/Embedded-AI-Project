@@ -13,7 +13,8 @@ import {
 } from '@components/ConfigMenu/ConfigMenu';
 
 import { ModelOptions } from '@type/chat';
-import { _defaultChatConfig, _defaultSystemMessage } from '@constants/chat';
+import { _defaultChatConfig, _defaultSystemMessage, DEFAULT_SYSTEM_PROMPTS } from '@constants/chat';
+import { SystemPrompt } from '@type/prompt';
 
 const ChatConfigMenu = () => {
   const { t } = useTranslation('model');
@@ -131,6 +132,9 @@ const DefaultSystemChat = ({
   _setSystemMessage: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   const { t } = useTranslation('model');
+  const systemPrompts = useStore((state) => state.systemPrompts);
+  const activeSystemPromptId = useStore((state) => state.activeSystemPromptId);
+  const setActiveSystemPromptId = useStore((state) => state.setActiveSystemPromptId);
 
   const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     e.target.style.height = 'auto';
@@ -149,8 +153,34 @@ const DefaultSystemChat = ({
     e.target.style.maxHeight = '2.5rem';
   };
 
+  const handleSystemPromptChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const promptId = e.target.value;
+    setActiveSystemPromptId(promptId);
+    
+    // Find the selected system prompt
+    const selectedPrompt = systemPrompts.find(p => p.id === promptId);
+    if (selectedPrompt) {
+      _setSystemMessage(selectedPrompt.prompt);
+    }
+  };
+
   return (
     <div>
+      <div className='block text-sm font-medium text-gray-900 dark:text-white mb-2'>
+        {t('systemPromptTemplate')}
+      </div>
+      <select
+        className="w-full p-2 mb-2 border border-gray-300 rounded-md dark:border-gray-600 dark:bg-gray-700 text-sm text-gray-900 dark:text-gray-300"
+        value={activeSystemPromptId}
+        onChange={handleSystemPromptChange}
+      >
+        {systemPrompts.map((prompt) => (
+          <option key={prompt.id} value={prompt.id}>
+            {prompt.name}
+          </option>
+        ))}
+      </select>
+      
       <div className='block text-sm font-medium text-gray-900 dark:text-white'>
         {t('defaultSystemMessage')}
       </div>

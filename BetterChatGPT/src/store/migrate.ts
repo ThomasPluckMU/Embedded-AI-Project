@@ -18,7 +18,19 @@ import {
   defaultUserMaxToken,
 } from '@constants/chat';
 import { officialAPIEndpoint } from '@constants/auth';
-import defaultPrompts from '@constants/prompt';
+import { DEFAULT_PROMPT, DEFAULT_PROMPTS } from '@constants/prompt';
+
+// Define defaultPrompts with explicit typing
+const defaultPrompts = Object.entries(DEFAULT_PROMPTS).map(([id, promptData]: [string, {
+  name: string;
+  prompt: string;
+  temperature: number;
+}]) => ({
+  id,
+  name: promptData.name,
+  prompt: promptData.prompt,
+  temperature: promptData.temperature
+}));
 
 export const migrateV0 = (persistedState: LocalStorageInterfaceV0ToV1) => {
   persistedState.chats.forEach((chat) => {

@@ -13,6 +13,7 @@ import InlineLatexToggle from './InlineLatexToggle';
 
 import PromptLibraryMenu from '@components/PromptLibraryMenu';
 import ChatConfigMenu from '@components/ChatConfigMenu';
+import SystemPromptLibraryMenu from '@components/SystemPromptLibraryMenu';
 import EnterToSubmitToggle from './EnterToSubmitToggle';
 import TotalTokenCost, { TotalTokenCostToggle } from './TotalTokenCost';
 import ClearConversation from '@components/Menu/MenuOptions/ClearConversation';
@@ -54,6 +55,7 @@ const SettingsMenu = () => {
             </div>
             <ClearConversation />
             <PromptLibraryMenu />
+            <SystemPromptLibraryMenu />
             <ChatConfigMenu />
             <TotalTokenCost />
           </div>

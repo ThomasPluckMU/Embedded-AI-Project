@@ -17,6 +17,20 @@ export const _defaultSystemMessage =
 Carefully heed the user's instructions. 
 Respond using Markdown.`;
 
+// Default system prompts that define the AI's behavior
+export const DEFAULT_SYSTEM_PROMPTS = [
+  {
+    id: "default",
+    name: "Default Assistant",
+    prompt: _defaultSystemMessage
+  },
+  {
+    id: "sales",
+    name: "Sales Assistant",
+    prompt: `You are a highly skilled AI Sales Assistant specializing in need discovery and proposal generation. You receive transcripts from customer interviews or workshops. Your job is to: 1. Identify the customer’s key pain points, goals, and constraints from the transcript. 2. Summarize those needs in clear, concise bullet points. 3. Generate a structured sales proposal that addresses each need with specific offerings or solutions. 4. If necessary, ask clarifying questions to refine your proposal. Deliver your output in a professional, client-ready tone.`
+  },
+];
+
 export const modelOptions: ModelOptions[] = [
   'gpt-3.5-turbo',
   'gpt-3.5-turbo-16k',
@@ -152,17 +166,32 @@ export const _defaultChatConfig: ConfigInterface = {
 export const generateDefaultChat = (
   title?: string,
   folder?: string
-): ChatInterface => ({
-  id: uuidv4(),
-  title: title ? title : 'New Chat',
-  messages:
-    useStore.getState().defaultSystemMessage.length > 0
-      ? [{ role: 'system', content: useStore.getState().defaultSystemMessage }]
-      : [],
-  config: { ...useStore.getState().defaultChatConfig },
-  titleSet: false,
-  folder,
-});
+): ChatInterface => {
+  const store = useStore.getState();
+  const systemMessage = store.defaultSystemMessage;
+  const activeSystemPromptId = store.activeSystemPromptId;
+  
+  // Always prioritize the active system prompt if one is selected
+  let systemContent = systemMessage;
+  if (activeSystemPromptId) {
+    const activePrompt = store.systemPrompts.find(p => p.id === activeSystemPromptId);
+    if (activePrompt) {
+      systemContent = activePrompt.prompt;
+    }
+  }
+  
+  return {
+    id: uuidv4(),
+    title: title ? title : 'New Chat',
+    messages:
+      systemContent.length > 0
+        ? [{ role: 'system', content: systemContent }]
+        : [],
+    config: { ...store.defaultChatConfig },
+    titleSet: false,
+    folder,
+  };
+};
 
 export const codeLanguageSubset = [
   'python',
