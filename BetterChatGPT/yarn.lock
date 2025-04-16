@@ -663,6 +663,19 @@ assemblyai@^4.9.0:
   dependencies:
     ws "^8.18.0"
 
+<<<<<<< HEAD
+=======
+assert-plus@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.npmjs.org/assert-plus/-/assert-plus-1.0.0.tgz"
+  integrity sha512-NfJ4UzBCcQGLDlQq7nHxH+tv3kyZ0hHQqF5BO6J7tNJeP5do1llPr8dZ8zHonfhAu0PHAdMkSo+8o0wxg9lZWw==
+
+astral-regex@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.npmjs.org/astral-regex/-/astral-regex-2.0.0.tgz"
+  integrity sha512-Z7tMw1ytTXt5jqMcOP+OQteU1VuNK9Y02uuJtKQ1Sv69jXQKKg5cibLwGJow8yzZP+eAc18EmLGPal0bp36rvQ==
+
+>>>>>>> 9543f4f66a24ff0970b8ad6e650ed02271dbba6c
 async-exit-hook@^2.0.1:
   version "2.0.1"
   resolved "https://registry.npmjs.org/async-exit-hook/-/async-exit-hook-2.0.1.tgz"
@@ -3953,7 +3966,11 @@ ws@^8.18.0:
   resolved "https://registry.npmjs.org/ws/-/ws-8.18.1.tgz"
   integrity sha512-RKW2aJZMXeMxVpnZ6bck+RswznaxmzdULiBr6KY7XkTnW8uvt0iT9H5DkHUChXrc+uurzwa0rVI16n/Xzjdz1w==
 
+<<<<<<< HEAD
 xmlbuilder@^15.1.1:
+=======
+xmlbuilder@^15.1.1, xmlbuilder@>=11.0.1:
+>>>>>>> 9543f4f66a24ff0970b8ad6e650ed02271dbba6c
   version "15.1.1"
   resolved "https://registry.npmjs.org/xmlbuilder/-/xmlbuilder-15.1.1.tgz"
   integrity sha512-yMqGBqtXyeN1e3TGYvgNgDVZ3j84W4cwkOXQswghol6APgZWaff9lnbvN7MHYJOiXsvGPXtjTYJEiC9J2wv9Eg==
