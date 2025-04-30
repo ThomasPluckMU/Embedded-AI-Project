@@ -7,8 +7,14 @@ export interface PromptSlice {
   setPrompts: (commandPrompt: Prompt[]) => void;
 }
 
+// Convert the object structure to an array with IDs
+const defaultPromptsArray: Prompt[] = Object.entries(defaultPrompts).map(([key, value]) => ({
+  id: key, // Use the key as the ID
+  ...value, // Spread the rest of the properties
+}));
+
 export const createPromptSlice: StoreSlice<PromptSlice> = (set, get) => ({
-  prompts: defaultPrompts,
+  prompts: defaultPromptsArray,
   setPrompts: (prompts: Prompt[]) => {
     set((prev: PromptSlice) => ({
       ...prev,
