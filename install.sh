@@ -2,9 +2,9 @@
 
 brew install npm
 
-npm install /BetterChatGPT
+npm install ./BetterChatGPT
 
-pip install -r requirments.txt
+pip install -r requirements.txt
 
 npm run dev ./BetterChatGPT
 chroma run --path ./db

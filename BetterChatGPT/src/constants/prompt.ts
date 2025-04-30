@@ -16,7 +16,6 @@ export const DEFAULT_PROMPTS = {
 - Ask clarifying questions when the request is ambiguous`,
     temperature: 0.3, // Lower temperature for more deterministic responses
   },
-
   creativeWriter: {
     name: "Creative Writer",
     prompt: `You are a creative writing assistant with expertise in storytelling, poetry, and creative content. Follow these guidelines:
@@ -43,6 +42,10 @@ export const DEFAULT_PROMPTS = {
 
 // Keep any existing exports like this one
 export const DEFAULT_PROMPT = DEFAULT_PROMPTS.professionalAssistant;
+
+export const getPromptByName = (name: string): Prompt => {
+  return DEFAULT_PROMPTS[name] || DEFAULT_PROMPT;
+};
 
 // Add this line to fix the import errors
 export default DEFAULT_PROMPTS;

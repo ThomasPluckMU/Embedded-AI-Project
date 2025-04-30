@@ -1,10 +1,11 @@
 import { StoreSlice } from './store';
-import { Prompt } from '@type/prompt';
-import defaultPrompts from '@constants/prompt';
+import { Prompt, SystemPrompt } from '@type/prompt';
+import { DEFAULT_PROMPTS } from '@constants/prompt';
+import { DEFAULT_SYSTEM_PROMPTS } from '@constants/chat';
 
 export interface PromptSlice {
   prompts: Prompt[];
-  setPrompts: (commandPrompt: Prompt[]) => void;
+  setPrompts: (prompts: Prompt[]) => void;
 }
 
 // Convert the object structure to an array with IDs
@@ -14,7 +15,7 @@ const defaultPromptsArray: Prompt[] = Object.entries(defaultPrompts).map(([key, 
 }));
 
 export const createPromptSlice: StoreSlice<PromptSlice> = (set, get) => ({
-  prompts: defaultPromptsArray,
+  prompts: defaultPrompts,
   setPrompts: (prompts: Prompt[]) => {
     set((prev: PromptSlice) => ({
       ...prev,

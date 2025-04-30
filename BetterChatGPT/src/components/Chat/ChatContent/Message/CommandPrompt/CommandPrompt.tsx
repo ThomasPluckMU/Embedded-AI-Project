@@ -11,9 +11,9 @@ const CommandPrompt = ({
   _setContent: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   const { t } = useTranslation();
-
+  
   // Get prompts from the store and ensure it's always an array
-  const storePrompts = useStore((state) => state.prompts);
+  const storePrompts = useStore((state) => state.prompts) || [];
   const [input, setInput] = useState<string>('');
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -27,7 +27,7 @@ const CommandPrompt = ({
   }, [dropDown]);
 
   useEffect(() => {
-    const currentPrompts = useStore.getState().prompts;
+    const currentPrompts = useStore.getState().prompts || [];
     if (Array.isArray(currentPrompts)) {
       const filteredPrompts = matchSorter(currentPrompts, input, {
         keys: ['name'],
@@ -67,7 +67,7 @@ const CommandPrompt = ({
           onChange={(e) => setInput(e.target.value)}
         />
         <ul className='text-sm text-gray-700 dark:text-gray-200 p-0 m-0 w-max max-w-sm max-md:max-w-[90vw] max-h-32 overflow-auto'>
-          {Array.isArray(_prompts) &&
+          {Array.isArray(_prompts) && _prompts.length > 0 ? (
             _prompts.map((prompt) => (
               <li
                 key={prompt.id}
@@ -79,7 +79,12 @@ const CommandPrompt = ({
               >
                 {prompt.name}
               </li>
-            ))}
+            ))
+          ) : (
+            <li className='px-4 py-2 text-gray-500 dark:text-gray-400'>
+              {t('noPrompts')}
+            </li>
+          )}
         </ul>
       </div>
     </div>
