@@ -1,8 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import useStore from '@store/store';
+
 import { useTranslation } from 'react-i18next';
 import { matchSorter } from 'match-sorter';
 import { Prompt } from '@type/prompt';
+
 import useHideOnOutsideClick from '@hooks/useHideOnOutsideClick';
 
 const CommandPrompt = ({
@@ -11,37 +13,36 @@ const CommandPrompt = ({
   _setContent: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   const { t } = useTranslation();
-  
-  // Get prompts from the store and ensure it's always an array
-  const storePrompts = useStore((state) => state.prompts) || [];
+  const prompts = useStore((state) => state.prompts) || [];
+  const [_prompts, _setPrompts] = useState<Prompt[]>(Array.isArray(prompts) ? prompts : []);
   const [input, setInput] = useState<string>('');
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [dropDown, setDropDown, dropDownRef] = useHideOnOutsideClick();
-  const [_prompts, _setPrompts] = useState<Prompt[]>(Array.isArray(storePrompts) ? storePrompts : []);
 
   useEffect(() => {
     if (dropDown && inputRef.current) {
+      // When dropdown is visible, focus the input
       inputRef.current.focus();
     }
   }, [dropDown]);
 
   useEffect(() => {
-    const currentPrompts = useStore.getState().prompts || [];
-    if (Array.isArray(currentPrompts)) {
-      const filteredPrompts = matchSorter(currentPrompts, input, {
-        keys: ['name'],
-      });
-      _setPrompts(filteredPrompts);
-    } else {
-      _setPrompts([]);
-    }
+    const storePrompts = useStore.getState().prompts || [];
+    const filteredPrompts = Array.isArray(storePrompts) 
+      ? matchSorter(storePrompts, input, { keys: ['name'] })
+      : [];
+    _setPrompts(filteredPrompts);
   }, [input]);
 
   useEffect(() => {
-    _setPrompts(Array.isArray(storePrompts) ? storePrompts : []);
+    if (Array.isArray(prompts)) {
+      _setPrompts(prompts);
+    } else {
+      _setPrompts([]);
+    }
     setInput('');
-  }, [storePrompts]);
+  }, [prompts]);
 
   return (
     <div className='relative max-wd-sm' ref={dropDownRef}>
@@ -64,20 +65,22 @@ const CommandPrompt = ({
           className='text-gray-800 dark:text-white p-3 text-sm border-none bg-gray-200 dark:bg-gray-600 m-0 w-full mr-0 h-8 focus:outline-none'
           value={input}
           placeholder={t('search') as string}
-          onChange={(e) => setInput(e.target.value)}
+          onChange={(e) => {
+            setInput(e.target.value);
+          }}
         />
         <ul className='text-sm text-gray-700 dark:text-gray-200 p-0 m-0 w-max max-w-sm max-md:max-w-[90vw] max-h-32 overflow-auto'>
           {Array.isArray(_prompts) && _prompts.length > 0 ? (
-            _prompts.map((prompt) => (
+            _prompts.map((cp) => (
               <li
-                key={prompt.id}
                 className='px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white cursor-pointer text-start w-full'
                 onClick={() => {
-                  _setContent((prev) => prev + prompt.prompt);
+                  _setContent((prev) => prev + cp.prompt);
                   setDropDown(false);
                 }}
+                key={cp.id}
               >
-                {prompt.name}
+                {cp.name}
               </li>
             ))
           ) : (
