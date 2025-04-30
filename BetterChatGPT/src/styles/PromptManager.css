@@ -1,0 +1,44 @@
+/* src/styles/PromptManager.css */
+
+.prompt-manager {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 1rem;
+  background: #f5f5f5;
+  border-radius: 8px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+}
+
+.prompt-manager label {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.prompt-manager input,
+.prompt-manager textarea {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.input-error {
+  border: 1px solid #dc3545 !important;
+  background-color: rgba(220, 53, 69, 0.05);
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.character-count {
+  text-align: right;
+  font-size: 12px;
+  color: #6c757d;
+  margin-top: -4px;
+  margin-bottom: 8px;
+}
