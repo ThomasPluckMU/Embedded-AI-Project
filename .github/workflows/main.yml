@@ -1,11 +1,9 @@
 name: CI/CD
-
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-
 jobs:
   frontend:
     strategy:
@@ -97,4 +95,3 @@ jobs:
         run: |
           python run_tests.py --backend-only
         shell: pwsh
-
