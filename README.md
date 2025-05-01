@@ -1,8 +1,10 @@
 # Embedded AI - Group 1
 
-## Project Brief
+To use this repository, clone it:
 
-...
+```bash
+git clone https://github.com/ThomasPluckMU/Embedded-AI-Project
+```
 
 ## Installation
 
@@ -92,4 +94,9 @@ pytest tests/
 
 ## Task Attribution
 
-...
+You can build the repository in Ubuntu using `texlive` with the `latexmk` command:
+
+```bash
+cd report
+latexmk -f main.tex
+```
