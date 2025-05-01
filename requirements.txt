@@ -1,0 +1,7 @@
+chromadb
+flask
+flask-cors
+requests
+selenium
+pytest
+

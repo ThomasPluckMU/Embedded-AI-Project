@@ -1,0 +1,97 @@
+name: CI/CD
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+jobs:
+  frontend:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Install BetterChatGPT dependencies
+        working-directory: ./BetterChatGPT
+        run: npm ci
+      - name: Build app
+        working-directory: ./BetterChatGPT
+        run: npm run build
+        
+  chroma-server:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ['3.9', '3.10', '3.11', '3.12']
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Verify ChromaDB server
+        run: |
+          python -c "import chromadb; import flask; print('Dependencies successfully installed')"
+  
+  integration-tests:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ['3.9', '3.10', '3.11', '3.12']
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest selenium
+      - name: Setup Chrome
+        uses: browser-actions/setup-chrome@latest
+      
+      # Run backend integration tests
+      - name: Run RAG integration tests
+        run: |
+          python -m pytest tests/test_rag.py -v
+      
+      # Start ChromaDB server differently based on OS
+      - name: Start ChromaDB server (Linux/macOS)
+        if: runner.os != 'Windows'
+        run: |
+          python chroma_server.py > /dev/null 2>&1 &
+          sleep 5  # Give the server time to start
+        shell: bash
+      
+      - name: Start ChromaDB server (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          Start-Process -NoNewWindow python -ArgumentList "chroma_server.py"
+          Start-Sleep -s 5  # Give the server time to start
+        shell: pwsh
+      
+      # Run the test runner with backend-only flag to avoid UI dependencies
+      - name: Run test runner (Linux/macOS)
+        if: runner.os != 'Windows'
+        run: |
+          python run_tests.py --backend-only
+        shell: bash
+      
+      - name: Run test runner (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          python run_tests.py --backend-only
+        shell: pwsh
