@@ -1,0 +1,26 @@
+\documentclass[conference]{IEEEtran}
+% Import preamble with packages and settings
+\input{preamble}
+% Import custom commands
+\input{commands}
+\begin{document}
+% Generate title page
+\maketitlepage
+\onecolumn
+% Import content sections
+\input{sections/abstract}
+\vfill
+\input{sections/declaration}
+\tableofcontents
+\newpage
+\input{sections/glossary}
+\newpage
+\twocolumn
+\input{sections/technical_background.tex}
+\input{sections/main_body.tex}
+
+% Bibliography
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}
