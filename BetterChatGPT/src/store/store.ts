@@ -67,6 +67,9 @@ export const createPartializedState = (state: StoreState) => ({
   useRAG: state.useRAG,
 });
 
+// Define the expected type for the migrated state
+type PersistedState = ReturnType<typeof createPartializedState>;
+
 const useStore = create<StoreState>()(
   persist(
     (set, get) => ({
@@ -82,27 +85,51 @@ const useStore = create<StoreState>()(
       name: 'free-chat-gpt',
       partialize: (state) => createPartializedState(state),
       version: 8,
-      migrate: (persistedState, version) => {
+      migrate: (persistedState: unknown, version: number): PersistedState => {
+        const state = persistedState as any;
+        
         switch (version) {
           case 0:
-            migrateV0(persistedState as LocalStorageInterfaceV0ToV1);
+            migrateV0(state as LocalStorageInterfaceV0ToV1);
           case 1:
-            migrateV1(persistedState as LocalStorageInterfaceV1ToV2);
+            migrateV1(state as LocalStorageInterfaceV1ToV2);
           case 2:
-            migrateV2(persistedState as LocalStorageInterfaceV2ToV3);
+            migrateV2(state as LocalStorageInterfaceV2ToV3);
           case 3:
-            migrateV3(persistedState as LocalStorageInterfaceV3ToV4);
+            migrateV3(state as LocalStorageInterfaceV3ToV4);
           case 4:
-            migrateV4(persistedState as LocalStorageInterfaceV4ToV5);
+            migrateV4(state as LocalStorageInterfaceV4ToV5);
           case 5:
-            migrateV5(persistedState as LocalStorageInterfaceV5ToV6);
+            migrateV5(state as LocalStorageInterfaceV5ToV6);
           case 6:
-            migrateV6(persistedState as LocalStorageInterfaceV6ToV7);
+            migrateV6(state as LocalStorageInterfaceV6ToV7);
           case 7:
-            migrateV7(persistedState as LocalStorageInterfaceV7oV8);
+            migrateV7(state as LocalStorageInterfaceV7oV8);
             break;
         }
-        return persistedState as StoreState;
+        
+        // Ensure all required properties exist
+        if (!state.chats) state.chats = [];
+        if (state.currentChatIndex === undefined) state.currentChatIndex = 0;
+        if (state.apiEndpoint === undefined) state.apiEndpoint = "";
+        if (state.theme === undefined) state.theme = "dark";
+        if (state.autoTitle === undefined) state.autoTitle = false;
+        if (state.advancedMode === undefined) state.advancedMode = false;
+        if (state.prompts === undefined) state.prompts = [];
+        if (state.systemPrompts === undefined) state.systemPrompts = [];
+        if (state.activeSystemPromptId === undefined) state.activeSystemPromptId = null;
+        if (state.hideMenuOptions === undefined) state.hideMenuOptions = false;
+        if (state.firstVisit === undefined) state.firstVisit = true;
+        if (state.hideSideMenu === undefined) state.hideSideMenu = false;
+        if (state.folders === undefined) state.folders = {};
+        if (state.enterToSubmit === undefined) state.enterToSubmit = true;
+        if (state.inlineLatex === undefined) state.inlineLatex = false;
+        if (state.markdownMode === undefined) state.markdownMode = true;
+        if (state.totalTokenUsed === undefined) state.totalTokenUsed = 0;
+        if (state.countTotalTokens === undefined) state.countTotalTokens = false;
+        if (state.useRAG === undefined) state.useRAG = false;
+        
+        return state as PersistedState;
       },
     }
   )
