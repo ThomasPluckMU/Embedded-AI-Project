@@ -1,198 +1,220 @@
+// src/components/Prompt/PromptSettings.tsx
+
 import React, { useState } from 'react';
 import useStore from '@store/store';
-import { useTranslation } from 'react-i18next';
+import { Prompt } from '@type/prompt';
 import { v4 as uuidv4 } from 'uuid';
 
-import PopupModal from '@components/PopupModal';
-import { SystemPrompt } from '@type/prompt';
-
-const SystemPromptLibraryMenu = () => {
-  const { t } = useTranslation();
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-
+const PromptSettings: React.FC = () => {
+  const prompts = useStore((state) => state.prompts);
+  const setPrompts = useStore((state) => state.setPrompts);
+  
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editContent, setEditContent] = useState('');
+  const [editTemperature, setEditTemperature] = useState(0.5);
+  const [temperatureError, setTemperatureError] = useState('');
+  
+  // Function to validate temperature
+  const validateTemperature = (value: number): string => {
+    if (isNaN(value)) {
+      return 'Temperature must be a number';
+    }
+    if (value < 0 || value > 1) {
+      return 'Temperature must be between 0 and 1';
+    }
+    return '';
+  };
+  
+  // Start editing a prompt
+  const handleEdit = (index: number) => {
+    const prompt = prompts[index];
+    setEditingIndex(index);
+    setEditName(prompt.name);
+    setEditContent(prompt.prompt);
+    setEditTemperature(prompt.temperature);
+    setTemperatureError('');
+  };
+  
+  // Cancel editing
+  const handleCancel = () => {
+    setEditingIndex(null);
+  };
+  
+  // Save edited prompt
+  const handleSave = () => {
+    if (editingIndex === null) return;
+    
+    const error = validateTemperature(editTemperature);
+    if (error) {
+      setTemperatureError(error);
+      return;
+    }
+    
+    const updatedPrompts = [...prompts];
+    updatedPrompts[editingIndex] = {
+      ...updatedPrompts[editingIndex],
+      name: editName,
+      prompt: editContent,
+      temperature: editTemperature
+    };
+    
+    setPrompts(updatedPrompts);
+    setEditingIndex(null);
+  };
+  
+  // Delete a prompt
+  const handleDelete = (index: number) => {
+    if (window.confirm('Are you sure you want to delete this prompt?')) {
+      const updatedPrompts = [...prompts];
+      updatedPrompts.splice(index, 1);
+      setPrompts(updatedPrompts);
+    }
+  };
+  
+  // Add a new prompt
+  const handleAddPrompt = () => {
+    const newPrompt: Prompt = {
+      id: uuidv4(),
+      name: 'New Prompt',
+      prompt: 'Enter your prompt here...',
+      temperature: 0.5
+    };
+    
+    setPrompts([...prompts, newPrompt]);
+  };
+  
+  // Handle temperature change
+  const handleTemperatureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseFloat(e.target.value);
+    setEditTemperature(value);
+    setTemperatureError(validateTemperature(value));
+  };
+  
   return (
-    <div>
-      <button
-        className='btn btn-neutral'
-        onClick={() => setIsModalOpen(true)}
-        aria-label='System Prompts'
+    <div className="p-4">
+      <h2 className="text-xl font-bold mb-4">Prompt Settings</h2>
+      
+      <button 
+        className="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        onClick={handleAddPrompt}
       >
-        System Prompts
+        Add New Prompt
       </button>
-      {isModalOpen && <SystemPromptPopup setIsModalOpen={setIsModalOpen} />}
+      
+      <div className="space-y-4">
+        {prompts.map((prompt, index) => (
+          <div key={prompt.id} className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800">
+            {editingIndex === index ? (
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Name</label>
+                  <input
+                    type="text"
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                    className="w-full p-2 border rounded"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-1">Prompt Content</label>
+                  <textarea
+                    value={editContent}
+                    onChange={(e) => setEditContent(e.target.value)}
+                    rows={3}
+                    className="w-full p-2 border rounded"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Temperature: {editTemperature}
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.1"
+                    value={editTemperature}
+                    onChange={handleTemperatureChange}
+                    className="w-full"
+                  />
+                  <div className="flex justify-between text-xs">
+                    <span>Precise (0.0)</span>
+                    <span>Creative (1.0)</span>
+                  </div>
+                  {temperatureError && (
+                    <p className="text-red-500 text-xs mt-1">{temperatureError}</p>
+                  )}
+                </div>
+                
+                <div className="flex space-x-2">
+                  <button
+                    onClick={handleSave}
+                    className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
+                  >
+                    Save
+                  </button>
+                  <button
+                    onClick={handleCancel}
+                    className="px-3 py-1 bg-gray-500 text-white rounded hover:bg-gray-600"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <div className="flex justify-between items-center">
+                  <h3 className="font-medium">{prompt.name}</h3>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => handleEdit(index)}
+                      className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(index)}
+                      className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+                
+                <p className="text-sm text-gray-500 mt-1 line-clamp-2">{prompt.prompt}</p>
+                
+                <div className="mt-2">
+                  <div className="flex items-center">
+                    <span className="text-sm mr-2">Temperature:</span>
+                    <span 
+                      className={`text-sm font-medium ${
+                        prompt.temperature < 0 || prompt.temperature > 1 
+                          ? 'text-red-500' 
+                          : 'text-green-500'
+                      }`}
+                    >
+                      {prompt.temperature}
+                      {(prompt.temperature < 0 || prompt.temperature > 1) && 
+                        ' (Invalid - should be between 0 and 1)'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+        
+        {prompts.length === 0 && (
+          <div className="text-center p-6 bg-gray-100 dark:bg-gray-800 rounded-lg">
+            No prompts available. Click "Add New Prompt" to create one.
+          </div>
+        )}
+      </div>
     </div>
   );
 };
 
-const SystemPromptPopup = ({
-  setIsModalOpen,
-}: {
-  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
-}) => {
-  const systemPrompts = useStore((state) => state.systemPrompts);
-  const setSystemPrompts = useStore((state) => state.setSystemPrompts);
-  const activeSystemPromptId = useStore((state) => state.activeSystemPromptId);
-  const setActiveSystemPromptId = useStore((state) => state.setActiveSystemPromptId);
-
-  const [newPromptName, setNewPromptName] = useState<string>('');
-  const [newPromptContent, setNewPromptContent] = useState<string>('');
-  const [editingPromptId, setEditingPromptId] = useState<string | null>(null);
-
-  const handleSave = () => {
-    if (editingPromptId) {
-      // Update existing prompt
-      const updatedPrompts = systemPrompts.map((prompt) =>
-        prompt.id === editingPromptId
-          ? { ...prompt, name: newPromptName, prompt: newPromptContent }
-          : prompt
-      );
-      setSystemPrompts(updatedPrompts);
-      setEditingPromptId(null);
-    } else if (newPromptName && newPromptContent) {
-      // Add new prompt
-      const newPrompt: SystemPrompt = {
-        id: uuidv4(),
-        name: newPromptName,
-        prompt: newPromptContent,
-      };
-      setSystemPrompts([...systemPrompts, newPrompt]);
-    }
-    
-    // Reset form
-    setNewPromptName('');
-    setNewPromptContent('');
-  };
-
-  const handleEdit = (prompt: SystemPrompt) => {
-    setEditingPromptId(prompt.id);
-    setNewPromptName(prompt.name);
-    setNewPromptContent(prompt.prompt);
-  };
-
-  const handleDelete = (id: string) => {
-    const updatedPrompts = systemPrompts.filter((prompt) => prompt.id !== id);
-    setSystemPrompts(updatedPrompts);
-    
-    // If we're deleting the active prompt, select another one
-    if (id === activeSystemPromptId && updatedPrompts.length > 0) {
-      setActiveSystemPromptId(updatedPrompts[0].id);
-    }
-  };
-
-  const handleActivate = (id: string) => {
-    setActiveSystemPromptId(id);
-  };
-
-  const handleCancel = () => {
-    setNewPromptName('');
-    setNewPromptContent('');
-    setEditingPromptId(null);
-  };
-
-  return (
-    <PopupModal
-      title="System Prompts Library"
-      setIsModalOpen={setIsModalOpen}
-      cancelButton={false}
-    >
-      <div className='p-4 sm:p-6 border-b border-gray-200 dark:border-gray-600 w-full max-h-[80vh] overflow-y-auto text-sm text-gray-900 dark:text-gray-300'>
-        <div className='flex flex-col gap-4 max-w-4xl mx-auto'>
-          <div className='border rounded-md p-3 sm:p-4 dark:border-gray-600'>
-            <h3 className='text-lg font-bold mb-2'>
-              {editingPromptId ? 'Edit System Prompt' : 'Add New System Prompt'}
-            </h3>
-            <div className='flex flex-col gap-2'>
-              <div>
-                <label className='block text-sm font-medium'>Name</label>
-                <input
-                  type='text'
-                  value={newPromptName}
-                  onChange={(e) => setNewPromptName(e.target.value)}
-                  className='w-full p-2 border rounded-md dark:border-gray-600 dark:bg-gray-700'
-                  placeholder='Enter prompt name'
-                />
-              </div>
-              <div>
-                <label className='block text-sm font-medium'>Prompt Content</label>
-                <textarea
-                  value={newPromptContent}
-                  onChange={(e) => setNewPromptContent(e.target.value)}
-                  className='w-full p-2 border rounded-md min-h-[120px] sm:min-h-[150px] dark:border-gray-600 dark:bg-gray-700'
-                  placeholder='Enter system prompt content'
-                />
-              </div>
-              <div className='flex justify-end gap-2 mt-2'>
-                <button
-                  className='btn btn-neutral'
-                  onClick={handleCancel}
-                >
-                  Cancel
-                </button>
-                <button
-                  className='btn btn-primary'
-                  onClick={handleSave}
-                  disabled={!newPromptName || !newPromptContent}
-                >
-                  {editingPromptId ? 'Update' : 'Add'}
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <h3 className='text-lg font-bold mb-2'>Your System Prompts</h3>
-            {systemPrompts.length === 0 ? (
-              <p className='text-gray-500 dark:text-gray-400'>No system prompts found</p>
-            ) : (
-              <div className='grid gap-2'>
-                {systemPrompts.map((prompt) => (
-                  <div
-                    key={prompt.id}
-                    className={`border rounded-md p-3 dark:border-gray-600 ${
-                      prompt.id === activeSystemPromptId
-                        ? 'bg-gray-100 dark:bg-gray-700'
-                        : ''
-                    }`}
-                  >
-                    <div className='flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2'>
-                      <h4 className='font-medium'>{prompt.name}</h4>
-                      <div className='flex flex-wrap gap-2'>
-                        <button
-                          className={`px-2 py-1 rounded-md text-xs ${
-                            prompt.id === activeSystemPromptId
-                              ? 'bg-green-500 text-white'
-                              : 'bg-gray-200 dark:bg-gray-600'
-                          }`}
-                          onClick={() => handleActivate(prompt.id)}
-                        >
-                          {prompt.id === activeSystemPromptId ? 'Active' : 'Activate'}
-                        </button>
-                        <button
-                          className='px-2 py-1 bg-blue-500 text-white rounded-md text-xs'
-                          onClick={() => handleEdit(prompt)}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          className='px-2 py-1 bg-red-500 text-white rounded-md text-xs'
-                          onClick={() => handleDelete(prompt.id)}
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </div>
-                    <p className='mt-2 text-xs text-gray-500 dark:text-gray-400 line-clamp-2'>
-                      {prompt.prompt}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </PopupModal>
-  );
-};
-
-export default SystemPromptLibraryMenu;
+export default PromptSettings;

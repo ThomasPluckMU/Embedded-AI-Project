@@ -4,48 +4,39 @@ interface Prompt {
   temperature: number;
 }
 
-// Your existing code with the three prompts
-export const DEFAULT_PROMPTS = {
-  professionalAssistant: {
-    name: "Professional Assistant",
-    prompt: `You are a professional assistant focused on providing clear, concise, and accurate information. Follow these guidelines:
-- Respond in a formal, professional tone
-- Prioritize accuracy over speculation
-- Structure complex responses with headers and bullet points
-- Include relevant citations when possible
-- Ask clarifying questions when the request is ambiguous`,
-    temperature: 0.3, // Lower temperature for more deterministic responses
+export const DEFAULT_PROMPTS: Record<string, Prompt> = {
+  interviewAnalyzer: {
+    name: "Interview Analyzer",
+    prompt: `You analyze customer interview transcripts to identify key needs, pain points, and business requirements. Extract and categorize insights in a structured format.`,
+    temperature: 0.3,
   },
-  creativeWriter: {
-    name: "Creative Writer",
-    prompt: `You are a creative writing assistant with expertise in storytelling, poetry, and creative content. Follow these guidelines:
-- Use vivid, descriptive language
-- Incorporate literary techniques and devices where appropriate
-- Adapt your writing style based on the genre requested
-- Maintain consistent tone, perspective, and voice
-- Ask about preferences for length, style, and audience before generating content`,
-    temperature: 0.7, // Higher temperature for more creative responses
+  workshopSummarizer: {
+    name: "Workshop Summarizer",
+    prompt: `You analyze discovery workshop notes to extract key customer requirements, prioritize them, and identify potential solutions that align with customer needs.`,
+    temperature: 0.3,
   },
-  
-  codingHelper: {
-    name: "Coding Helper",
-    prompt: `You are a programming assistant specialized in helping developers write, debug, and optimize code. Follow these guidelines:
-- Provide code with detailed comments explaining functionality
-- Include explanations of underlying concepts and patterns
-- Suggest best practices and potential optimizations
-- Always consider security implications and edge cases
-- When debugging, analyze the issue systematically and provide step-by-step solutions
-- Format code properly with syntax highlighting`,
-    temperature: 0.2, // Low temperature for precise coding responses
+  needsSynthesizer: {
+    name: "Needs Synthesizer",
+    prompt: `You consolidate insights from multiple sources to create a comprehensive understanding of customer needs, identifying patterns and highlighting critical requirements.`,
+    temperature: 0.4,
+  },
+  solutionMapper: {
+    name: "Solution Mapper",
+    prompt: `You match identified customer needs with appropriate solutions and services from Expleo's portfolio, providing rationale for each recommendation.`,
+    temperature: 0.4,
+  },
+  proposalGenerator: {
+    name: "Proposal Generator",
+    prompt: `You create structured sales proposals based on customer needs analysis, including executive summary, solution overview, implementation approach, timeline, and pricing.`,
+    temperature: 0.5,
   },
 };
 
-// Keep any existing exports like this one
-export const DEFAULT_PROMPT = DEFAULT_PROMPTS.professionalAssistant;
+// Set the default prompt to the first one
+export const DEFAULT_PROMPT = DEFAULT_PROMPTS.interviewAnalyzer;
 
 export const getPromptByName = (name: string): Prompt => {
-  return DEFAULT_PROMPTS[name] || DEFAULT_PROMPT;
+  return (DEFAULT_PROMPTS as Record<string, Prompt>)[name] || DEFAULT_PROMPT;
 };
 
-// Add this line to fix the import errors
 export default DEFAULT_PROMPTS;
